@@ -1,4 +1,5 @@
 import { useStore } from '../store/useStore';
+import Avatar from './Avatar';
 
 export default function StatsCard() {
   const getStats = useStore((state) => state.getStats);
@@ -38,7 +39,7 @@ export default function StatsCard() {
         </div>
         <div className="text-center p-4 bg-dark-gray rounded-lg border border-white/10 hover:border-neon-pink/50 transition-all">
           <p className="text-4xl font-bold text-neon-pink mb-1">
-            {stats.mostActiveCharacter ? '👑' : '—'}
+            {stats.mostActiveCharacter ? '1' : '—'}
           </p>
           <p className="text-xs text-white/60 uppercase tracking-wider">Most Active</p>
         </div>
@@ -75,7 +76,7 @@ export default function StatsCard() {
         <div className="mt-6 pt-6 border-t border-white/10">
           <p className="text-xs text-white/60 uppercase tracking-wider mb-2">Most Active Character</p>
           <div className="flex items-center space-x-3">
-            <span className="text-3xl">{stats.mostActiveCharacter.avatar}</span>
+            <Avatar character={stats.mostActiveCharacter} size="lg" />
             <div>
               <p className="font-bold text-pure-white">{stats.mostActiveCharacter.name}</p>
               <p className="text-xs text-white/60 capitalize">{stats.mostActiveCharacter.personality}</p>

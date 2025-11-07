@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 
 const PERSONALITY_TYPES = [
@@ -16,10 +16,13 @@ const AVATAR_COLORS = [
   '#6366f1', '#8b5cf6'
 ];
 
-export default function CreateCharacter() {
+export default function EditCharacter() {
+  const { characterId } = useParams();
   const navigate = useNavigate();
-  const addCharacter = useStore((state) => state.addCharacter);
-  const setActiveCharacter = useStore((state) => state.setActiveCharacter);
+  const characters = useStore((state) => state.characters);
+  const updateCharacter = useStore((state) => state.updateCharacter);
+
+  const character = characters.find((c) => c.id === characterId);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -31,15 +34,35 @@ export default function CreateCharacter() {
   });
 
   const [errors, setErrors] = useState({});
-  const [avatarType, setAvatarType] = useState('initial'); // 'initial' or 'custom'
+  const [avatarType, setAvatarType] = useState('initial');
   const [imagePreview, setImagePreview] = useState(null);
 
   const avatarLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
+  // Load character data
+  useEffect(() => {
+    if (character) {
+      setFormData({
+        name: character.name,
+        personality: character.personality,
+        backstory: character.backstory,
+        avatar: character.avatar || character.name?.charAt(0)?.toUpperCase() || 'A',
+        avatarColor: character.avatarColor || AVATAR_COLORS[0],
+        customImage: character.customImage || null,
+      });
+      
+      if (character.customImage) {
+        setAvatarType('custom');
+        setImagePreview(character.customImage);
+      } else {
+        setAvatarType('initial');
+      }
+    }
+  }, [character]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -48,22 +71,18 @@ export default function CreateCharacter() {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         setErrors((prev) => ({ ...prev, avatar: 'Please upload a valid image file' }));
         return;
       }
       
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setErrors((prev) => ({ ...prev, avatar: 'Image must be less than 5MB' }));
         return;
       }
 
-      // Clear any avatar errors
       setErrors((prev) => ({ ...prev, avatar: '' }));
 
-      // Create preview and store image data
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -78,7 +97,7 @@ export default function CreateCharacter() {
     setAvatarType(type);
     if (type === 'initial') {
       setImagePreview(null);
-      setFormData((prev) => ({ ...prev, customImage: null, avatar: 'A' }));
+      setFormData((prev) => ({ ...prev, customImage: null, avatar: character.avatar || 'A' }));
     }
     setErrors((prev) => ({ ...prev, avatar: '' }));
   };
@@ -109,19 +128,31 @@ export default function CreateCharacter() {
       return;
     }
 
-    const characterId = addCharacter(formData);
-    setActiveCharacter(characterId);
+    updateCharacter(characterId, formData);
     navigate(`/chat/${characterId}`);
   };
+
+  if (!character) {
+    return (
+      <div className="text-center py-20 fade-in">
+        <div className="text-6xl sm:text-8xl mb-6 text-neon-pink font-bold">404</div>
+        <h2 className="text-2xl sm:text-3xl font-bold text-pure-white mb-3">Character Not Found</h2>
+        <p className="text-white/60 mb-8 text-base sm:text-lg">This character doesn't exist or has been deleted.</p>
+        <Link to="/characters" className="btn-primary">
+          View All Characters
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto fade-in">
       <div className="mb-6 sm:mb-8 text-center">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-pure-white mb-3">
-          Create New <span className="text-neon-green">Character</span>
+          Edit <span className="text-neon-cyan">{character.name}</span>
         </h1>
         <p className="text-white/60 text-sm sm:text-base md:text-lg">
-          Design a unique character with their own personality and backstory
+          Update your character's personality and backstory
         </p>
       </div>
 
@@ -139,7 +170,7 @@ export default function CreateCharacter() {
               onClick={() => handleAvatarTypeChange('initial')}
               className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium uppercase tracking-wide transition-all duration-300 ${
                 avatarType === 'initial'
-                  ? 'bg-neon-green text-pure-black font-bold'
+                  ? 'bg-neon-cyan text-pure-black font-bold'
                   : 'bg-dark-gray text-white/60 hover:text-pure-white border border-white/10'
               }`}
             >
@@ -150,7 +181,7 @@ export default function CreateCharacter() {
               onClick={() => handleAvatarTypeChange('custom')}
               className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium uppercase tracking-wide transition-all duration-300 ${
                 avatarType === 'custom'
-                  ? 'bg-neon-green text-pure-black font-bold'
+                  ? 'bg-neon-cyan text-pure-black font-bold'
                   : 'bg-dark-gray text-white/60 hover:text-pure-white border border-white/10'
               }`}
             >
@@ -169,7 +200,7 @@ export default function CreateCharacter() {
                     onClick={() => setFormData((prev) => ({ ...prev, avatar: letter, customImage: null }))}
                     className={`text-xl sm:text-2xl font-bold p-3 rounded-lg transition-all duration-300 ${
                       formData.avatar === letter && !formData.customImage
-                        ? 'bg-neon-green/20 ring-2 ring-neon-green scale-110 shadow-neon-green text-neon-green'
+                        ? 'bg-neon-cyan/20 ring-2 ring-neon-cyan scale-110 shadow-lg text-neon-cyan'
                         : 'bg-dark-gray hover:bg-mid-gray border border-white/10 text-white/60'
                     }`}
                     style={{ backgroundColor: formData.avatar === letter ? formData.avatarColor + '20' : undefined }}
@@ -206,10 +237,9 @@ export default function CreateCharacter() {
           {/* Custom Image Upload */}
           {avatarType === 'custom' && (
             <div className="space-y-4">
-              {/* Image Preview */}
               {imagePreview ? (
                 <div className="flex flex-col items-center gap-4">
-                  <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-lg overflow-hidden border-2 border-neon-green shadow-neon-green">
+                  <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-lg overflow-hidden border-2 border-neon-cyan shadow-lg">
                     <img 
                       src={imagePreview} 
                       alt="Character preview" 
@@ -220,7 +250,7 @@ export default function CreateCharacter() {
                     type="button"
                     onClick={() => {
                       setImagePreview(null);
-                      setFormData((prev) => ({ ...prev, customImage: null, avatar: 'A' }));
+                      setFormData((prev) => ({ ...prev, customImage: null, avatar: character.avatar }));
                     }}
                     className="btn-outline text-sm"
                   >
@@ -235,7 +265,7 @@ export default function CreateCharacter() {
                     onChange={handleImageUpload}
                     className="hidden"
                   />
-                  <div className="border-2 border-dashed border-white/20 hover:border-neon-green rounded-lg p-8 sm:p-12 text-center cursor-pointer transition-all duration-300 hover:bg-neon-green/5">
+                  <div className="border-2 border-dashed border-white/20 hover:border-neon-cyan rounded-lg p-8 sm:p-12 text-center cursor-pointer transition-all duration-300 hover:bg-neon-cyan/5">
                     <svg className="w-16 h-16 mx-auto mb-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -331,7 +361,7 @@ export default function CreateCharacter() {
             Cancel
           </button>
           <button type="submit" className="btn-primary w-full sm:w-auto">
-            Create & Start Chatting
+            Save Changes
           </button>
         </div>
       </form>

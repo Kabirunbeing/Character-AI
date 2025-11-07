@@ -9,6 +9,14 @@ export default function Layout({ children }) {
     { path: '/', label: 'Home' },
     { path: '/create', label: 'Create' },
     { path: '/characters', label: 'Characters' },
+    { path: '/templates', label: 'Templates' },
+    { path: '/search', label: 'Search' },
+    { path: '/favorites', label: 'Favorites' },
+    { path: '/history', label: 'History' },
+    { path: '/analytics', label: 'Analytics' },
+    { path: '/backup', label: 'Backup' },
+    { path: '/about', label: 'About' },
+    { path: '/settings', label: 'Settings' },
   ];
 
   return (
@@ -18,7 +26,7 @@ export default function Layout({ children }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group" onClick={() => setMobileMenuOpen(false)}>
-              <span className="text-2xl sm:text-3xl transition-transform group-hover:scale-110">⚔️</span>
+              <span className="text-2xl sm:text-3xl transition-transform group-hover:scale-110 font-bold text-neon-green">RF</span>
               <span className="text-lg sm:text-xl md:text-2xl font-display font-bold text-pure-white group-hover:text-neon-green transition-colors">
                 RolePlayForge
               </span>

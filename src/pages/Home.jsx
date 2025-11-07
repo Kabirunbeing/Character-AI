@@ -24,7 +24,7 @@ export default function Home() {
         
         <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
           <Link to="/create" className="btn-primary text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4">
-            ✨ Create Character
+            Create Character
           </Link>
           {characters.length > 0 && (
             <Link to="/characters" className="btn-outline text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4">
@@ -37,7 +37,7 @@ export default function Home() {
       {/* Features Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 slide-up">
         <div className="card-hover group">
-          <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-110 transition-transform">🎭</div>
+          <div className="text-3xl sm:text-4xl mb-4 group-hover:scale-110 transition-transform font-bold text-neon-green">CC</div>
           <h3 className="text-lg sm:text-xl font-bold mb-3 text-pure-white">Create Characters</h3>
           <p className="text-sm sm:text-base text-white/60 leading-relaxed">
             Design unique personalities with names, traits, and rich backstories.
@@ -45,7 +45,7 @@ export default function Home() {
         </div>
 
         <div className="card-hover group">
-          <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-110 transition-transform">💬</div>
+          <div className="text-3xl sm:text-4xl mb-4 group-hover:scale-110 transition-transform font-bold text-neon-cyan">IC</div>
           <h3 className="text-lg sm:text-xl font-bold mb-3 text-pure-white">Interactive Chat</h3>
           <p className="text-sm sm:text-base text-white/60 leading-relaxed">
             Have conversations that reflect each character's unique personality.
@@ -53,7 +53,7 @@ export default function Home() {
         </div>
 
         <div className="card-hover group sm:col-span-2 lg:col-span-1">
-          <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-110 transition-transform">📚</div>
+          <div className="text-3xl sm:text-4xl mb-4 group-hover:scale-110 transition-transform font-bold text-neon-purple">BW</div>
           <h3 className="text-lg sm:text-xl font-bold mb-3 text-pure-white">Build Your World</h3>
           <p className="text-sm sm:text-base text-white/60 leading-relaxed">
             Create multiple characters and explore different narrative possibilities.
@@ -71,7 +71,7 @@ export default function Home() {
       {/* Getting Started */}
       {characters.length === 0 && (
         <div className="card bg-off-black border-neon-green/30 slide-up">
-          <h3 className="text-xl sm:text-2xl font-bold mb-6 text-neon-green">🚀 Getting Started</h3>
+          <h3 className="text-xl sm:text-2xl font-bold mb-6 text-neon-green">Getting Started</h3>
           <ol className="space-y-4 text-sm sm:text-base text-white/70">
             <li className="flex items-start">
               <span className="font-bold text-neon-green mr-3 text-lg sm:text-xl flex-shrink-0">1.</span>

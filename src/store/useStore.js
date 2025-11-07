@@ -29,7 +29,7 @@ const generateMockResponse = (character, userMessage) => {
       "I sense a deeper truth beneath your words.",
     ],
     cheerful: [
-      "Oh my gosh, that's so exciting! 🌟",
+      "Oh my gosh, that's so exciting!",
       "Yay! I love talking about this!",
       "This is going to be so much fun!",
       "You always have the best stories!",
@@ -50,7 +50,7 @@ export const useStore = create(
       activeCharacterId: null,
       searchQuery: '',
       filterPersonality: 'all',
-      sortBy: 'newest', // newest, oldest, name, mostChats
+      sortBy: 'newest', // newest, oldest, name, mostChats, favorites
 
       // Search and filter
       setSearchQuery: (query) => set({ searchQuery: query }),
@@ -95,6 +95,13 @@ export const useStore = create(
               return bMessages - aMessages;
             });
             break;
+          case 'favorites':
+            filtered.sort((a, b) => {
+              if (a.isFavorite && !b.isFavorite) return -1;
+              if (!a.isFavorite && b.isFavorite) return 1;
+              return new Date(b.createdAt) - new Date(a.createdAt);
+            });
+            break;
           case 'newest':
           default:
             filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -109,6 +116,7 @@ export const useStore = create(
         const newCharacter = {
           id: Date.now().toString(),
           ...character,
+          isFavorite: false,
           createdAt: new Date().toISOString(),
         };
         set((state) => ({
@@ -122,6 +130,15 @@ export const useStore = create(
         set((state) => ({
           characters: state.characters.map((c) =>
             c.id === id ? { ...c, ...updates, updatedAt: new Date().toISOString() } : c
+          ),
+        }));
+      },
+
+      // Toggle favorite status
+      toggleFavorite: (id) => {
+        set((state) => ({
+          characters: state.characters.map((c) =>
+            c.id === id ? { ...c, isFavorite: !c.isFavorite } : c
           ),
         }));
       },
@@ -266,6 +283,24 @@ export const useStore = create(
       clearConversation: (characterId) => {
         set((state) => ({
           conversations: state.conversations.filter((msg) => msg.characterId !== characterId),
+        }));
+      },
+
+      // Delete a specific message
+      deleteMessage: (messageId) => {
+        set((state) => ({
+          conversations: state.conversations.filter((msg) => msg.id !== messageId),
+        }));
+      },
+
+      // Edit a specific message
+      editMessage: (messageId, newText) => {
+        set((state) => ({
+          conversations: state.conversations.map((msg) =>
+            msg.id === messageId
+              ? { ...msg, text: newText, edited: true, editedAt: new Date().toISOString() }
+              : msg
+          ),
         }));
       },
 
